@@ -1,0 +1,69 @@
+import numpy as np
+import pandas as pd
+import scipy as sp
+import matplotlib.pyplot as mp
+
+# Linear discriminant analysis model
+# Compute log-odds ratio
+# Decision boundary, log-odds ratio>0, then output is 1; 0 otherwise
+
+
+# P(y=0)
+def probability_class1(n0, n1):
+    return n1/(n0+n1)
+
+
+# P(y=1)
+def probability_class0(n0, n1):
+    return n0/(n0+n1)
+
+
+# y is an array with same size of x, but in form of [i,i,i,i,i,i,i...]
+# Mu1, if object from class1 contains feature xi, then i=1; 0 otherwise
+def mean_class1(n1, y, x):
+    x = np.array(y) * np.array(x)
+    result = np.sum(x, axis=0)
+    return result/n1
+
+
+# y is an array with same size of x, but in form of [i,i,i,i,i,i,i...]
+# Mu0, if object from class0 contains feature xi, then i=1; 0 otherwise
+def mean_class0(n0, y, x):
+    x = np.array(y) * np.array(x)
+    result = np.sum(x, axis=0)
+    return result/n0
+
+
+# y is an array with same size of x, but in form of [i,i,i,i,i,i,i...]
+def covariance(n0, n1, y0, y1, x):  # i is if object from class0/1 contains feature xi, then i=1; 0 otherwise
+
+    # when class0
+    array0 = np.multiply(y0, x)
+    sum0 = 0
+    for array in array0:
+        difference_array0 = array - mean_class0(n0, y0, x)
+        sum0 = sum0 + np.dot(difference_array0, difference_array0.T)
+    a = sum0/(n0 + n1 - 2)
+
+    # when class1
+    array1 = np.multiply(y1, x)
+    sum1 = 0
+    for array in array1:
+        difference_array1 = array - mean_class0(n1, y1, x)
+        sum1 = sum1 + np.dot(difference_array1, difference_array1.T)
+    b = sum1 / (n0 + n1 - 2)
+
+    # covariance
+    covar = a + b
+    return covar
+
+
+# computing log-odds ratio
+def log_odds_ratio(n0, n1, y0, y1, x):
+    log_ratio = np.log(probability_class1(n0, n1)/probability_class0(n0, n1))
+    mu1 = mean_class1(n1, y1, x)
+    mu0 = mean_class0(n0, y0, x)
+    covar = np.linalg.inv(covariance(n0, n1, y0, y1, x))
+
+    ratio = log_ratio - (mu1.T * mu1 * covar)/2 + (mu0.T * mu0 * covar)/2 + (mu1-mu0) * x.T * covar
+    return ratio
