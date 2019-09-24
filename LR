@@ -51,12 +51,10 @@ class LogisticRegression:
     # w=w'-(learning rate)*gradient of error function
     # gradient descent step
     def fit(self, X, y, learning_rate=0.001, iteration=50000):
-        difference = 1.0
-        min_difference = 0.1  # difference between w and w'
         iteration_counter = 0
         cross_en = []
 
-        while iteration_counter <= iteration and difference >= min_difference:
+        while iteration_counter <= iteration:
             gradient = self.gradient_cross_entropy(X, y)
             cost = self.cross_entropy(X, y)
             store_w = self.w
@@ -69,7 +67,7 @@ class LogisticRegression:
         return self.w, cross_en
 
 
-    # predicting the data points question!!!!!!!
+    # predicting the data points
     def predict(self, X):
         prediction = []
         for i in range(len(X.index)):
@@ -87,25 +85,13 @@ class LogisticRegression:
 
 
     def evaluate_acc(self, y, prediction_y):
-        TP = 0
-        TN = 0
-        FP = 0
-        FN = 0
+
+        y = list(y)
 
         for i in range(len(prediction_y)):
-            if prediction_y[i] == 1:
-                if y[i] == 1:
-                    TP += 1
-                elif y[i] == 0:
-                    FP += 1
-            elif prediction_y[i] == 0:
-                if y[i] == 0:
-                    FN += 1
-                elif y[i] == 1:
-                    TN += 1
 
-        accuracy = float(TP + TN)/float(TP + TN + FP + FN)
-        return accuracy
+            differences = np.subtract(y, prediction_y)
+            return (len(differences) - np.sum(np.abs(differences))) / len(differences)
 
 
 wine_df = pd.read_csv("winequality-red.csv", delimiter=";")
@@ -128,10 +114,7 @@ wine_df.insert(0, "Constant", 1)
 X = wine_df[wine_df.columns[0:12]]
 y = wine_df["quality_modified"]
 test1 = lr_wine.gradient_cross_entropy(X, y)
-print(test1)
 test2 = lr_wine.fit(X[0:1200], y[0:1200], learning_rate=0.001, iteration=50000)
-print(test2)
 prediction = lr_wine.predict(X[1200:1600])
-print(prediction)
 number = lr_wine.evaluate_acc(y[1200:1600], prediction)
-#print(number)
+print(number)
