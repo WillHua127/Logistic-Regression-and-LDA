@@ -1,0 +1,18 @@
+ def confusion_matrix(self, y, prediction_y):
+        matrix = np.zeros(shape=(2, 2))
+        y = np.array(y)
+        prediction_y = np.array(prediction_y)
+
+        for i in range(len(prediction_y)):
+            if y[i] == 1:
+                if prediction_y[i] != 1:
+                    matrix[0][1] = matrix[0][1] + 1
+                else:
+                    matrix[0][0] = matrix[0][0] + 1
+            elif y[i] == 0:
+                if prediction_y[i] != 0:
+                    matrix[1][0] = matrix[1][0] + 1
+                else:
+                    matrix[1][1] = matrix[1][1] + 1
+
+        return matrix
